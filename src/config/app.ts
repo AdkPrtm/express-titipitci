@@ -5,10 +5,19 @@ import redisClient from "../utils/redis-client.util";
 
 dotenv.config();
 
-export const PORT = process.env.PORT || 3000;
-export const NODE_ENV = process.env.NODE_ENV || "development";
+export const PORT = process.env.PORT ?? 3000;
+export const NODE_ENV = process.env.NODE_ENV ?? "development";
 
-export const prisma = new PrismaClient();
+const prismaClientSingleton = () => {
+  return new PrismaClient();
+};
+
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
+
+export const prisma =
+  globalForPrisma.prisma ?? (globalForPrisma.prisma = prismaClientSingleton());
 
 export const connectDB = async () => {
     try {

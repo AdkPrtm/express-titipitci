@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import {generateToken, verifyToken} from "../config/auth";
+import {verifyToken} from "../config/auth";
 import { AppError } from "./error-handler.middleware";
-import { PrismaClient } from "@prisma/client";
 import { logger } from "../utils/logger.util";
+import { prisma } from "../config/app";
 
-const prisma = new PrismaClient()
 
 declare global {
     namespace Express {

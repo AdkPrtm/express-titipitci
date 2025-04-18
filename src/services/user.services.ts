@@ -1,8 +1,6 @@
 import { CreateUserModel } from "../models/user-request.models";
 import { UserResponse } from "../models/user-response.model";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient()
+import { prisma } from "../config/app";
 
 class UserService {
     async createUser(userData: CreateUserModel): Promise<UserResponse> {

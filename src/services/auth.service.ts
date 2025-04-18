@@ -1,12 +1,10 @@
 import { AppError } from "../middlewares/error-handler.middleware";
 import { CreateUserAdminRequestModel } from "../models/auth-request.model";
 import { AuthResponse } from "../models/auth-response.model";
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "../config/app";
 import { hashPassword } from "../utils/password.utils";
 import { generateToken } from "../config/auth";
 import { logger } from "../utils/logger.util";
-
-const prisma = new PrismaClient()
 
 class AuthService {
     async createUser(userData: CreateUserAdminRequestModel): Promise<AuthResponse> {
