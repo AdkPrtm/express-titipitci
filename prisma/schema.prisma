@@ -19,14 +19,92 @@ enum EnumRole {
   CASHIER
 }
 
+enum EnumProcces {
+  DITERIMA
+  DIPROSES
+}
+
+enum EnumStatusPembayaranCOD {
+  BELUM_BAYAR
+  SUDAH_BAYAR
+}
+
+enum EnumMethodPembayaran {
+  QRIS
+  TRANSFER
+  CASH
+}
+
+enum EnumAlamatPengambilan {
+  KM5
+  TANJUNG
+}
+
+enum EnumStatusTransaksi {
+  BERHASIL
+  GAGAL
+}
+
 model User {
-  id              Int      @id @default(autoincrement())
-  name            String
-  whatsapp_number String
-  address         String
-  role            EnumRole
-  email           String? @unique
-  password        String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt()
+  id             Int         @id @default(autoincrement())
+  name           String
+  whatsappNumber String      @map("whatsapp_number")
+  address        String
+  role           EnumRole
+  email          String?     @unique
+  password       String?
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt() @map("updated_at")
+  resi           Resi[]
+  transaksi      Transaksi[]
+
+  @@map("users")
+}
+
+model Transaksi {
+  id                Int                   @id @default(autoincrement())
+  tanggalDiambil    DateTime              @map("tanggal_diambil")
+  feeCod            Float                 @map("fee_cod")
+  feeJastip         Float                 @map("fee_jastip")
+  statusTransaksi   EnumStatusTransaksi   @map("status_transaksi")
+  metodePembayaran  EnumMethodPembayaran  @map("metode_pembayaran")
+  alamatPengambilan EnumAlamatPengambilan @map("alamat_pengambilan")
+  catatan           String?
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt() @map("updated_at")
+  user              User                  @relation(fields: [userId], references: [id])
+  userId            Int                   @map("user_id")
+
+  resi Resi[]
+
+  @@map("transactions")
+}
+
+model Resi {
+  id              Int         @id @default(autoincrement())
+  user            User        @relation(fields: [userId], references: [id])
+  userId          Int         @map("user_id")
+  noResi          String      @unique @map("no_resi")
+  tanggalDiterima DateTime    @map("tanggal_diterima")
+  posisiPaket     String      @map("posisi_paket")
+  estimasiTiba    DateTime    @map("estimasi_tiba")
+  statusPaket     EnumProcces @map("status_paket")
+  statusCod       Boolean     @map("status_cod")
+  transaksi       Transaksi   @relation(fields: [transaksiId], references: [id])
+  transaksiId     Int         @map("transaksi_id")
+  cod             COD?
+
+  @@map("resi")
+}
+
+model COD {
+  id                Int                     @id @default(autoincrement())
+  jumlahCod         Int
+  statusPembayaran  EnumStatusPembayaranCOD
+  methodPembayaran  EnumMethodPembayaran
+  tanggalPembayaran DateTime?
+  resi              Resi                    @relation(fields: [resiId], references: [id])
+  resiId            Int                     @unique
+
+  @@map("cod")
 }

@@ -30,14 +30,14 @@ const format = winston.format.combine(
   winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss:ms' }),
   winston.format.colorize({ all: true }),
   winston.format.printf(
-    (info) => `${info.timestamp} ${info.level}: ${info.message}`
-  )
+    (info) => `${info.timestamp} ${info.level}: ${info.message}`,
+  ),
 );
 
 const transports = [
   // Console logger
   new winston.transports.Console(),
-  
+
   // Error log file
   new winston.transports.File({
     filename: path.join(logDir, 'error.log'),
@@ -48,10 +48,10 @@ const transports = [
     filename: path.join(logDir, 'warn.log'),
     level: 'warn',
   }),
-  
+
   // Combined log file (all levels)
-  new winston.transports.File({ 
-    filename: path.join(logDir, 'combined.log') 
+  new winston.transports.File({
+    filename: path.join(logDir, 'combined.log'),
   }),
 ];
 

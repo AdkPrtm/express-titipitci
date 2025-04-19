@@ -1,6 +1,6 @@
-import { UserResponse } from "./user-response.model";
+import { UserResponse } from './user-response.model';
 
-export interface AuthResponse extends UserResponse{
-    token: string;
-    email: string
+export interface AuthResponse extends UserResponse {
+  token: string;
+  email: string;
 }
