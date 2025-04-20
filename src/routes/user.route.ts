@@ -7,7 +7,13 @@ import { Router } from 'express';
 
 const router = Router();
 
-router.post('/', validate(createUserSchema), authenticate, authorize('ADMIN'), userController.createUser);
+router.post(
+  '/',
+  validate(createUserSchema),
+  authenticate,
+  authorize('ADMIN'),
+  userController.createUser,
+);
 router.get(
   '/',
   authenticate,

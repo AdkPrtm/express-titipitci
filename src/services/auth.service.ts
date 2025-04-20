@@ -1,5 +1,8 @@
 import { AppError } from '../middlewares/error-handler.middleware';
-import { CreateUserAdminRequestModel, LoginRequestModel } from '../models/auth-request.model';
+import {
+  CreateUserAdminRequestModel,
+  LoginRequestModel,
+} from '../models/auth-request.model';
 import { AuthResponse } from '../models/auth-response.model';
 import { prisma } from '../config/app';
 import { hashPassword, verifyPassword } from '../utils/password.utils';
@@ -70,7 +73,10 @@ class AuthService {
       throw new AppError('User not found', 404);
     }
 
-    const isValidPassword: boolean = await verifyPassword(userData.password, user.password!);
+    const isValidPassword: boolean = await verifyPassword(
+      userData.password,
+      user.password!,
+    );
     if (!isValidPassword) {
       logger.warn(`Invalid password for user with email: ${userData.email}`);
       throw new AppError('Credentials not match', 401);

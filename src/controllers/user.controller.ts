@@ -21,7 +21,7 @@ class UserController {
         data: user,
       };
 
-      await redisClientUtil.del('users:/api/user');
+      await redisClientUtil.delAllSpecificKey('users');
       await redisClientUtil.set(`user:${user.id}`, user, 600);
 
       res.status(201).json(response);
