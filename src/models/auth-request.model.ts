@@ -1,4 +1,4 @@
-import { CreateUserModel } from './user-request.models';
+import { CreateUserModel } from './user-request.model';
 
 export interface LoginRequestModel {
   email: string;
@@ -11,7 +11,7 @@ export interface CreateUserAdminRequestModel extends CreateUserModel {
 
 export interface UpdateUserAdminRequestModel {
   name?: string;
-  whatsapp_number?: string;
+  whatsappNumber?: string;
   address?: string;
   role?: string;
   email?: string;

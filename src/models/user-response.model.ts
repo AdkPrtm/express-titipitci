@@ -7,5 +7,4 @@ export interface UserResponse {
   createdAt: Date;
   updatedAt: Date;
   email?: string;
-  token?: string;
 }

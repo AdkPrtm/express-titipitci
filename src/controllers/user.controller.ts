@@ -1,12 +1,9 @@
 import { logger } from '../utils/logger.util';
 import { ApiResponse } from '../models/response.model';
 import { UserResponse } from '../models/user-response.model';
-import userServices from '../services/user.services';
+import userServices from '../services/user.service';
 import { Request, Response, NextFunction } from 'express';
 import redisClientUtil from '../utils/redis-client.util';
-
-const CACHE_PREFIX = 'user';
-const CACHE_TTL = 600;
 
 class UserController {
   async createUser(
@@ -25,7 +22,7 @@ class UserController {
       };
 
       await redisClientUtil.del('users:/api/user');
-      await redisClientUtil.set(`${CACHE_PREFIX}:${user.id}`, user, CACHE_TTL);
+      await redisClientUtil.set(`user:${user.id}`, user, 600);
 
       res.status(201).json(response);
     } catch (error) {

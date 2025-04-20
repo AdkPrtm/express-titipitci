@@ -11,6 +11,9 @@ export const requestLogger = (
   res.on('finish', () => {
     const duration = Date.now() - start;
     const message = `[${req.id}] ${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`;
+    if (duration > 2000) {
+      logger.warn(`${message} | has reached 2 seconds`);
+    }
 
     if (res.statusCode >= 500) {
       logger.error(message);

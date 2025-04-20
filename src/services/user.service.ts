@@ -1,23 +1,27 @@
-import { CreateUserModel } from '../models/user-request.models';
+import { CreateUserModel } from '../models/user-request.model';
 import { UserResponse } from '../models/user-response.model';
 import { prisma } from '../config/app';
 
 class UserService {
   async createUser(userData: CreateUserModel): Promise<UserResponse> {
     const user = await prisma.user.create({
-      data: userData,
+      data: {
+        name: userData.name,
+        whatsappNumber: userData.whatsapp_number,
+        address: userData.address,
+        role: userData.role,
+      },
     });
 
     const userResponse: UserResponse = {
       id: user.id,
       name: user.name,
-      whatsapp_number: user.whatsapp_number,
+      whatsapp_number: user.whatsappNumber,
       address: user.address,
       role: user.role,
       email: user.email ?? '',
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      token: '',
     };
 
     return userResponse;
@@ -33,7 +37,7 @@ class UserService {
     const userResponse = users.map((user) => ({
       id: user.id,
       name: user.name,
-      whatsapp_number: user.whatsapp_number,
+      whatsapp_number: user.whatsappNumber,
       address: user.address,
       role: user.role,
       email: user.email ?? '',
@@ -56,7 +60,7 @@ class UserService {
     const userResponse: UserResponse = {
       id: user.id,
       name: user.name,
-      whatsapp_number: user.whatsapp_number,
+      whatsapp_number: user.whatsappNumber,
       address: user.address,
       role: user.role,
       email: user.email ?? '',

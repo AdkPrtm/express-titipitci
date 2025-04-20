@@ -10,13 +10,34 @@ class AuthController {
       logger.debug(
         `[${req.id}] Register user with data: ${JSON.stringify(req.body)}`,
       );
-      const user = await authService.createUser(req.body);
+
+      const user = await authService.createUser({
+        ...req.body,
+        whatsappNumber: req.body.whatsapp_number,
+      });
       const response: ApiResponse<AuthResponse> = {
         message: 'User registered successfully',
         data: user,
       };
 
       res.status(201).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async loginUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      logger.debug(
+        `[${req.id}] Login user with data: ${JSON.stringify(req.body)}`,
+      );
+      const user = await authService.loginUser(req.body);
+      const response: ApiResponse<AuthResponse> = {
+        message: 'User logged in successfully',
+        data: user,
+      };
+
+      res.status(200).json(response);
     } catch (error) {
       next(error);
     }

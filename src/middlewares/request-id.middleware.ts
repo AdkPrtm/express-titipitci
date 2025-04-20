@@ -8,7 +8,6 @@ export const requestId = (req: Request, res: Response, next: NextFunction) => {
   next();
 };
 
-// Add the request ID type to Express Request
 declare global {
   namespace Express {
     interface Request {
