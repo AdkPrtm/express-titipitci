@@ -14,6 +14,10 @@ export interface UpdateUserModel {
   whatsapp_number?: string;
   address?: string;
   role?: string;
-  email?: string;
-  password?: string;
+}
+
+export interface FilterUserModel {
+  keyword?: string;
+  limit?: number;
+  cursor?: number;
 }

@@ -4,6 +4,7 @@ import {
   createResiSchema,
   deleteResiSchema,
   filterResiSchema,
+  updatePosisiSchema,
 } from '../validations/resi.validation';
 import ResiController from '../controllers/resi.controller';
 import { Router } from 'express';
@@ -39,6 +40,14 @@ router.put(
   validate(createResiSchema),
   ResiController.updateResi,
 );
+
+router.put(
+  '/',
+  authenticate,
+  authorize('ADMIN', 'CASHIER'),
+  validate(updatePosisiSchema),
+  ResiController.updatePosisi
+)
 router.delete(
   '/:resi',
   authenticate,

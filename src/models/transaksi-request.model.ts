@@ -17,11 +17,11 @@ export interface TransaksiRequestModel {
 
 export interface FilterTransaksiModel {
   name?: number;
-  noResi?: string;
-  tanggalDiambil?: Date;
-  statusTransaksi?: EnumStatusTransaksi;
-  metodePembayaran?: EnumMethodPembayaran;
-  alamatPengambilan?: EnumAlamatPengambilan;
+  nomor_resi?: string;
+  tanggal_diambil?: Date;
+  status_transaksi?: EnumStatusTransaksi;
+  metode_pembayaran?: EnumMethodPembayaran;
+  alamat_pengambilan?: EnumAlamatPengambilan;
   catatan?: string;
-  statusPaket?: EnumProcces;
+  status_paket?: EnumProcces;
 }

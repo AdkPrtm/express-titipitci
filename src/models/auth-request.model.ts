@@ -1,3 +1,4 @@
+import { EnumRole } from '@prisma/client';
 import { CreateUserModel } from './user-request.model';
 
 export interface LoginRequestModel {
@@ -10,10 +11,16 @@ export interface CreateUserAdminRequestModel extends CreateUserModel {
 }
 
 export interface UpdateUserAdminRequestModel {
+  user_id: number;
   name?: string;
-  whatsappNumber?: string;
+  whatsapp_number?: string;
   address?: string;
-  role?: string;
+  role?: EnumRole;
   email?: string;
-  password?: string;
+}
+
+export interface ChangePasswordModel {
+  old_password: string;
+  new_password: string;
+  user_id: number;
 }

@@ -50,3 +50,62 @@ export const loginSchema = z.object({
   query: z.object({}).optional(),
   params: z.object({}).optional(),
 });
+
+export const updatePasswordSchema = z.object({
+  body: z.object({
+    new_password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(100, 'Password is too long')
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/,
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+      ),
+    old_password: z
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .max(100, 'Password is too long')
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).*$/,
+        'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character',
+      ),
+  }),
+  query: z.object({}).optional(),
+  params: z.object({}).optional(),
+});
+
+
+export const updateDataAdminSchema = z.object({
+  body: z.object({
+    user_id: z.number({
+      required_error: 'User ID is required',
+      invalid_type_error: 'User ID must be a number',
+    }).positive('User ID must be a positive number'),
+
+    name: z
+      .string()
+      .min(2, 'Name must be at least 2 characters')
+      .max(100, 'Name is too long').optional(),
+    whatsapp_number: z
+      .string()
+      .regex(
+        /^\+\d{1,3}\d{10,12}$/,
+        'Invalid WhatsApp number format. Use international format (e.g., +628456789012)',
+      ).optional(),
+
+    address: z
+      .string()
+      .min(5, 'Address must be at least 5 characters')
+      .max(200, 'Address is too long').optional(),
+
+    role: z.enum(['ADMIN', 'USER', 'CASHIER'], {
+      errorMap: () => ({
+        message: 'Role must be either ADMIN, USER, or CASHIER',
+      }),
+    }).optional(),
+
+    email: z.string().email('Invalid email format').toLowerCase().trim(),
+  }),
+  query: z.object({}).optional(),
+  params: z.object({}).optional(),
+});

@@ -1,4 +1,4 @@
-import { cacheMiddleware } from '@/middlewares/cache.middleware';
+import { cacheMiddleware } from '../middlewares/cache.middleware';
 import transaksiController from '../controllers/transaksi.controller';
 import { authenticate, authorize } from '../middlewares/auth.middleware';
 import { validate } from '../middlewares/validator.middleware';

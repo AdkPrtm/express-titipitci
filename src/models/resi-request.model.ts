@@ -5,27 +5,26 @@ import {
 } from '@prisma/client';
 
 export interface CreateResiModel {
-  userId: number;
-  noResi: string;
-  tanggalDiterima: Date;
-  posisiPaket: string;
-  estimasiTiba: Date;
-  statusPaket: EnumProcces;
-  statusCod: boolean;
-  jumlahCod: number;
-  statusPembayaranCod: EnumStatusPembayaranCOD;
-  methodPembayaran: EnumMethodPembayaran;
-  tanggalPembayaran: Date;
+  user_id: number;
+  nomor_resi: string;
+  tanggal_diterima: Date;
+  posisi_paket: string;
+  estimasi_tiba: Date;
+  status_paket: EnumProcces;
+  status_cod: boolean;
+  jumlah_cod: number;
+  status_pembayaranCod: EnumStatusPembayaranCOD;
+  method_pembayaran: EnumMethodPembayaran;
+  tanggal_pembayaran: Date;
 }
 
 export interface FilterResiModel {
-  userId?: number;
-  noResi?: string;
-  tanggalDiterima?: Date;
-  posisiPaket?: string;
-  estimasiTiba?: Date;
-  statusPaket?: EnumProcces;
-  statusCod?: boolean;
-  statusPembayaranCod?: EnumStatusPembayaranCOD;
-  tanggalPembayaran?: Date;
+  keyword?: string;
+  limit?: number;
+  cursor?: number;
+}
+
+export interface UpdatePosisiModel {
+  nomor_resi: string[];
+  posisi_paket: string;
 }

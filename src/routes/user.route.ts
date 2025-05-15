@@ -21,8 +21,17 @@ router.get(
   cacheMiddleware({ keyPrefix: 'users', ttl: 600 }),
   userController.getAllUser,
 );
+
 router.get(
-  '/:id',
+  '/total',
+  authenticate,
+  authorize('ADMIN', 'CASHIER'),
+  cacheMiddleware({ keyPrefix: 'users', ttl: 600 }),
+  userController.getTotalUser,
+);
+
+router.get(
+  '/search',
   cacheMiddleware({ keyPrefix: 'user', ttl: 600 }),
   userController.getuserById,
 );

@@ -7,15 +7,20 @@ import { requestLogger } from './middlewares/request-logger.middleware';
 import { requestId } from './middlewares/request-id.middleware';
 import { errorHandler } from './middlewares/error-handler.middleware';
 import routes from './routes/index.route';
+import cookieParser from 'cookie-parser'
 
 const app: Application = express();
 
 // Middlewares
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3001',
+  credentials: true
+}));
 app.use(compression());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
 
 // Logging
 

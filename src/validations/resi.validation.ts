@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 export const createResiSchema = z.object({
   body: z.object({
-    userId: z
+    user_id: z
       .number({
         required_error: 'User ID wajib diisi',
         invalid_type_error: 'User ID harus berupa angka',
@@ -10,7 +10,7 @@ export const createResiSchema = z.object({
       .int('User ID harus bilangan bulat')
       .positive('User ID harus lebih dari 0'),
 
-    noResi: z
+    nomor_resi: z
       .string({
         required_error: 'Nomor resi wajib diisi',
         invalid_type_error: 'Nomor resi harus berupa teks',
@@ -18,12 +18,12 @@ export const createResiSchema = z.object({
       .trim()
       .min(1, 'Nomor resi tidak boleh kosong'),
 
-    tanggalDiterima: z.coerce.date({
+    tanggal_diterima: z.coerce.date({
       required_error: 'Tanggal diterima wajib diisi',
       invalid_type_error: 'Tanggal diterima tidak valid',
     }),
 
-    posisiPaket: z
+    posisi_paket: z
       .string({
         required_error: 'Posisi paket wajib diisi',
         invalid_type_error: 'Posisi paket harus berupa teks',
@@ -31,36 +31,36 @@ export const createResiSchema = z.object({
       .trim()
       .min(1, 'Posisi paket tidak boleh kosong'),
 
-    estimasiTiba: z.coerce.date({
+    estimasi_tiba: z.coerce.date({
       required_error: 'Estimasi tiba wajib diisi',
       invalid_type_error: 'Estimasi tiba tidak valid',
     }),
 
-    statusPaket: z.enum(['DITERIMA', 'DIPROSES'], {
+    status_paket: z.enum(['DITERIMA', 'DIPROSES'], {
       required_error: 'Status paket wajib diisi',
       invalid_type_error: 'Status paket harus "DITERIMA" atau "DIPROSES"',
     }),
 
-    statusCod: z.boolean({
+    status_cod: z.boolean({
       required_error: 'Status COD wajib diisi',
       invalid_type_error: 'Status COD harus berupa boolean (true/false)',
     }),
 
-    jumlahCod: z
+    jumlah_cod: z
       .number({
         invalid_type_error: 'Jumlah COD harus berupa angka',
       })
       .nonnegative('Jumlah COD tidak boleh negatif')
       .optional(),
 
-    statusPembayaranCod: z
+    status_pembayaranCod: z
       .enum(['BELUM_BAYAR', 'SUDAH_BAYAR'], {
         invalid_type_error:
           'Status pembayaran COD harus "LUNAS" atau "BELUM LUNAS"',
       })
       .optional(),
 
-    tanggalPembayaran: z.coerce
+    tanggal_pembayaran: z.coerce
       .date({
         invalid_type_error: 'Tanggal pembayaran tidak valid',
       })
@@ -74,7 +74,7 @@ export const filterResiSchema = z.object({
   body: z.object({}).optional(),
   params: z.object({}).optional(),
   query: z.object({
-    userId: z.coerce
+    user_id: z.coerce
       .number({
         invalid_type_error: 'User ID harus berupa angka',
       })
@@ -82,7 +82,7 @@ export const filterResiSchema = z.object({
       .positive('User ID harus lebih dari 0')
       .optional(),
 
-    noResi: z
+    nomor_resi: z
       .string({
         invalid_type_error: 'Nomor resi harus berupa teks',
       })
@@ -90,13 +90,13 @@ export const filterResiSchema = z.object({
       .min(1, 'Nomor resi tidak boleh kosong')
       .optional(),
 
-    tanggalDiterima: z.coerce
+    tanggal_diterima: z.coerce
       .date({
         invalid_type_error: 'Tanggal diterima tidak valid',
       })
       .optional(),
 
-    posisiPaket: z
+    posisi_paket: z
       .string({
         invalid_type_error: 'Posisi paket harus berupa teks',
       })
@@ -104,39 +104,39 @@ export const filterResiSchema = z.object({
       .min(1, 'Posisi paket tidak boleh kosong')
       .optional(),
 
-    estimasiTiba: z.coerce
+    estimasi_tiba: z.coerce
       .date({
         invalid_type_error: 'Estimasi tiba tidak valid',
       })
       .optional(),
 
-    statusPaket: z
+    status_paket: z
       .enum(['DITERIMA', 'DIPROSES'], {
         invalid_type_error: 'Status paket harus "DITERIMA" atau "DIPROSES"',
       })
       .optional(),
 
-    statusCod: z.coerce
+    status_cod: z.coerce
       .boolean({
         invalid_type_error: 'Status COD harus berupa boolean (true/false)',
       })
       .optional(),
 
-    jumlahCod: z
+    jumlah_cod: z
       .number({
         invalid_type_error: 'Jumlah COD harus berupa angka',
       })
       .nonnegative('Jumlah COD tidak boleh negatif')
       .optional(),
 
-    statusPembayaranCod: z
+    status_pembayaranCod: z
       .enum(['LUNAS', 'BELUM LUNAS'], {
         invalid_type_error:
           'Status pembayaran COD harus "LUNAS" atau "BELUM LUNAS"',
       })
       .optional(),
 
-    tanggalPembayaran: z.coerce
+    tanggal_pembayaran: z.coerce
       .date({
         invalid_type_error: 'Tanggal pembayaran tidak valid',
       })
@@ -148,7 +148,7 @@ export const deleteResiSchema = z.object({
   body: z.object({}).optional(),
   params: z
     .object({
-      noResi: z
+      nomor_resi: z
         .string({
           required_error: 'Nomor resi wajib diisi',
           invalid_type_error: 'Nomor resi harus berupa teks',
@@ -159,3 +159,22 @@ export const deleteResiSchema = z.object({
     .optional(),
   query: z.object({}).optional(),
 });
+
+export const updatePosisiSchema = z.object({
+  body: z.object({
+    nomor_resi: z
+      .array(z.string(), {
+        required_error: 'Nomor resi wajib diisi',
+        invalid_type_error: 'Nomor resi harus berupa teks',
+      })
+      .min(1, 'Nomor resi tidak boleh kosong'),
+      
+      posisi_paket: z
+      .string({
+        required_error: 'Posisi paket wajib diisi',
+        invalid_type_error: 'Posisi paket harus berupa teks',
+      })
+      .trim()
+      .min(1, 'Posisi paket tidak boleh kosong'),
+  })
+})

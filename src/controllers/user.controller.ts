@@ -1,9 +1,10 @@
 import { logger } from '../utils/logger.util';
 import { ApiResponse } from '../models/response.model';
-import { UserResponse } from '../models/user-response.model';
+import { UserPaginationResponse, UserResponse } from '../models/user-response.model';
 import userServices from '../services/user.service';
 import { Request, Response, NextFunction } from 'express';
 import redisClientUtil from '../utils/redis-client.util';
+import { FilterUserModel } from '@/models/user-request.model';
 
 class UserController {
   async createUser(
@@ -37,8 +38,15 @@ class UserController {
   ): Promise<void> {
     try {
       logger.debug(`[${req.id}] Getting all user data`);
-      const users = await userServices.getAllUser();
-      const response: ApiResponse<UserResponse[]> = {
+
+      const rawLimit = req.query.limit;
+      const limit = typeof rawLimit === 'string' ? parseInt(rawLimit, 10) : 10;
+
+      const rawCursor = req.query.cursor;
+      const cursor = typeof rawCursor === 'string' ? parseInt(rawCursor, 10) : undefined;
+
+      const users = await userServices.getAllUser(limit, cursor);
+      const response: ApiResponse<UserPaginationResponse> = {
         message: 'Get retrieved successfully',
         data: users,
       };
@@ -55,17 +63,40 @@ class UserController {
     next: NextFunction,
   ): Promise<void> {
     try {
-      logger.debug(`[${req.id}] Getting user by id: ${req.params.id}`);
-      const user = await userServices.getUserById(parseInt(req.params.id));
+      logger.debug(`[${req.id}] Getting user by keyword: ${req.query}`);
+
+      const { keyword, limit, cursor } = req.query;
+      const filter: FilterUserModel = {};
+
+      if (keyword !== undefined && keyword !== null) filter.keyword = String(keyword);
+      if (limit !== undefined && limit !== null) filter.limit = Number(limit);
+      if (cursor !== undefined && cursor !== null) filter.cursor = Number(cursor);
+
+      const user = await userServices.getUserByKeyowrd(filter);
 
       if (!user) {
         res.status(404).json({ message: 'User not found' });
         return;
       }
 
-      const response: ApiResponse<UserResponse> = {
-        message: 'Get user successfully',
+      const response: ApiResponse<UserPaginationResponse> = {
+        message: 'Search user successfully',
         data: user,
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getTotalUser(req: Request, res: Response, next: NextFunction) {
+    try {
+      logger.debug(`[${req.id}] Getting total user`);
+      const totalUser = await userServices.getTotalUser();
+      const response: ApiResponse<number> = {
+        message: 'Get total user successfully',
+        data: totalUser,
       };
 
       res.status(200).json(response);
