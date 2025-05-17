@@ -15,7 +15,7 @@ export const registerSchema = z.object({
 
     address: z
       .string()
-      .min(5, 'Address must be at least 5 characters')
+      .min(3, 'Address must be at least 5 characters')
       .max(200, 'Address is too long'),
 
     role: z.enum(['ADMIN', 'USER', 'CASHIER'], {

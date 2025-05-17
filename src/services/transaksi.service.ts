@@ -3,9 +3,19 @@ import {
   FilterTransaksiModel,
   TransaksiRequestModel,
 } from '../models/transaksi-request.model';
-import { TransaksiResponseModel } from '../models/transaksi-response';
+import {
+  TransaksiPaginationResponse,
+  TransaksiResponseModel,
+} from '../models/transaksi-response';
 import { prisma } from '../config/app';
 import { AppError } from '../middlewares/error-handler.middleware';
+import redisClientUtil from '../utils/redis-client.util';
+import {
+  EnumStatusTransaksi,
+  EnumMethodPembayaran,
+  EnumAlamatPengambilan,
+} from '@prisma/client';
+import { filter } from 'compression';
 
 class TransaksiService {
   /**
@@ -139,10 +149,28 @@ class TransaksiService {
     return response;
   }
 
-  async getAllTransaksiService(): Promise<TransaksiResponseModel[]> {
+  async getAllTransaksiService(
+    limit: number,
+    cursor?: number,
+  ): Promise<TransaksiPaginationResponse> {
     logger.debug('Getting all transaksi data');
 
+    let count: number | null = await redisClientUtil.get('transaksi-count');
+
+    if (!count) {
+      logger.info(`Cache miss for resi count`);
+      const resiCount = await prisma.resi.count();
+      await redisClientUtil.set('resi-count', resiCount, 120);
+      count = resiCount;
+    }
+
     const transaksi = await prisma.transaksi.findMany({
+      take: limit + 1,
+      orderBy: { id: 'desc' },
+      ...(cursor && {
+        skip: 1,
+        cursor: { id: cursor },
+      }),
       include: {
         user: {
           select: {
@@ -194,36 +222,111 @@ class TransaksiService {
       },
     );
 
-    return formattedTransactions;
+    logger.debug(`Resi data retrieved successfully`);
+    const hasNextPage = transaksi.length > limit;
+    const data = hasNextPage
+      ? formattedTransactions.slice(0, -1)
+      : formattedTransactions;
+    const dataTemp = hasNextPage ? transaksi.slice(0, -1) : transaksi;
+    const nextCursor = hasNextPage ? dataTemp[data.length - 1].id : null;
+    const totalPages = Math.ceil(count / limit);
+
+    const response: TransaksiPaginationResponse = {
+      transaksi: formattedTransactions,
+      next_cursor: nextCursor ?? 0,
+      total_pages: totalPages,
+      max_cursor: count,
+      has_next_page: hasNextPage,
+    };
+
+    return response;
   }
 
-  async getFilterTransaksiService(
-    filter: FilterTransaksiModel,
-  ): Promise<TransaksiResponseModel[]> {
-    logger.debug('Getting filter transaksi data');
+  async getFilterTransaksiService({
+    limit = 10,
+    cursor,
+    keyword: keywordSearch,
+  }: FilterTransaksiModel): Promise<TransaksiPaginationResponse> {
+    logger.debug(
+      `Getting filtered transaksi data with filter: ${keywordSearch} `,
+    );
+    const keyword = keywordSearch?.trim() ?? '';
 
-    const transaksi = await prisma.transaksi.findMany({
-      where: filter,
-      include: {
-        user: {
-          select: {
-            name: true,
-            whatsappNumber: true,
-            address: true,
+    const keywordFilter = keyword
+      ? {
+          OR: [
+            {
+              user: {
+                name: {
+                  contains: keyword,
+                },
+              },
+            },
+            {
+              tanggalDiambil: {
+                equals: new Date(keyword),
+              },
+            },
+            {
+              statusTransaksi: {
+                equals: keyword as EnumStatusTransaksi, // case-sensitive unless handled
+              },
+            },
+            {
+              metodePembayaran: {
+                equals: keyword as EnumMethodPembayaran,
+              },
+            },
+            {
+              alamatPengambilan: {
+                equals: keyword as EnumAlamatPengambilan,
+              },
+            },
+            {
+              transaksiItems: {
+                some: {
+                  resi: {
+                    noResi: {
+                      contains: keyword.toUpperCase(),
+                      mode: 'insensitive',
+                    },
+                  },
+                },
+              },
+            },
+          ],
+        }
+      : undefined;
+
+    const [transaksi, total] = await Promise.all([
+      prisma.transaksi.findMany({
+        take: limit + 1,
+        orderBy: { id: 'desc' },
+        ...(cursor && {
+          skip: 1,
+          cursor: { id: cursor },
+        }),
+        where: keywordFilter,
+        include: {
+          user: true,
+          transaksiItems: {
+            include: {
+              resi: true,
+            },
           },
         },
-        transaksiItems: {
-          include: {
-            resi: true,
-          },
-        },
-      },
-    });
+      }),
+      prisma.transaksi.count({ where: keywordFilter }),
+    ]);
 
     if (!transaksi) {
       logger.error('Failed to get transaksi data');
       throw new AppError('Failed to get transaksi data', 500);
     }
+
+    logger.debug(
+      `Filtered resi data retrieved successfully with filter: ${keywordSearch} `,
+    );
 
     const formattedTransactions: TransaksiResponseModel[] = transaksi.map(
       (transaction) => {
@@ -255,7 +358,23 @@ class TransaksiService {
       },
     );
 
-    return formattedTransactions;
+    const hasNextPage = transaksi.length > limit;
+    const data = hasNextPage
+      ? formattedTransactions.slice(0, -1)
+      : formattedTransactions;
+    const dataTemp = hasNextPage ? transaksi.slice(0, -1) : transaksi;
+    const nextCursor = hasNextPage ? dataTemp[data.length - 1].id : null;
+    const totalPages = Math.ceil(total / limit);
+
+    const response: TransaksiPaginationResponse = {
+      transaksi: formattedTransactions,
+      next_cursor: nextCursor ?? 0,
+      total_pages: totalPages,
+      max_cursor: 0,
+      has_next_page: hasNextPage,
+    };
+
+    return response;
   }
 }
 

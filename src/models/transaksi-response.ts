@@ -27,3 +27,11 @@ export interface TransaksiResponseModel {
   status: string;
   created_at: Date;
 }
+
+export interface TransaksiPaginationResponse {
+  transaksi: TransaksiResponseModel[];
+  next_cursor: number;
+  total_pages: number;
+  max_cursor: number;
+  has_next_page: boolean;
+}

@@ -15,13 +15,19 @@ export interface TransaksiRequestModel {
   status_paket?: EnumProcces;
 }
 
+// export interface FilterTransaksiModel {
+//   name?: number;
+//   nomor_resi?: string;
+//   tanggal_diambil?: Date;
+//   status_transaksi?: EnumStatusTransaksi;
+//   metode_pembayaran?: EnumMethodPembayaran;
+//   alamat_pengambilan?: EnumAlamatPengambilan;
+//   catatan?: string;
+//   status_paket?: EnumProcces;
+// }
+
 export interface FilterTransaksiModel {
-  name?: number;
-  nomor_resi?: string;
-  tanggal_diambil?: Date;
-  status_transaksi?: EnumStatusTransaksi;
-  metode_pembayaran?: EnumMethodPembayaran;
-  alamat_pengambilan?: EnumAlamatPengambilan;
-  catatan?: string;
-  status_paket?: EnumProcces;
+  keyword?: string;
+  limit?: number;
+  cursor?: number;
 }
