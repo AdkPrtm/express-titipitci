@@ -39,6 +39,7 @@ class ResiServices {
       estimasiTiba: resiData.estimasi_tiba,
       statusPaket: resiData.status_paket,
       statusCod: resiData.status_cod,
+      feeJastip: resiData.fee_jastip,
     };
 
     if (resiData.status_cod && resiData.jumlah_cod !== 0) {
@@ -48,6 +49,7 @@ class ResiServices {
           statusPembayaran: resiData.status_pembayaranCod,
           methodPembayaran: resiData.method_pembayaran,
           tanggalPembayaran: resiData.tanggal_pembayaran,
+          feeCod: resiData.fee_cod,
         },
       };
     }
@@ -75,7 +77,9 @@ class ResiServices {
       posisi_paket: resi.posisiPaket,
       estimasi_tiba: resi.estimasiTiba,
       status_paket: resi.statusPaket,
+      fee_jastip: resi.feeJastip,
       status_cod: resi.statusCod,
+      fee_cod: resi.cod?.feeCod ?? 0,
       jumlah_cod: resi.cod?.jumlahCod ?? 0,
       status_pembayaran_cod: resi.cod?.statusPembayaran ?? '',
       tanggal_pembayaran: resi.cod?.tanggalPembayaran ?? '',
@@ -123,8 +127,10 @@ class ResiServices {
         posisi_paket: resi.posisiPaket,
         estimasi_tiba: resi.estimasiTiba,
         status_paket: resi.statusPaket,
+        fee_jastip: resi.feeJastip,
         status_cod: resi.statusCod,
         jumlah_cod: resi.cod?.jumlahCod ?? 0,
+        fee_cod: resi.cod?.feeCod ?? 0,
         status_pembayaran_cod: resi.cod?.statusPembayaran ?? '',
         tanggal_pembayaran: resi.cod?.tanggalPembayaran ?? '',
         created_at: resi.createdAt,
@@ -201,8 +207,10 @@ class ResiServices {
         posisi_paket: resi.posisiPaket,
         estimasi_tiba: resi.estimasiTiba,
         status_paket: resi.statusPaket,
+        fee_jastip: resi.feeJastip,
         status_cod: resi.statusCod,
         jumlah_cod: resi.cod?.jumlahCod ?? 0,
+        fee_cod: resi.cod?.feeCod ?? 0,
         status_pembayaran_cod: resi.cod?.statusPembayaran ?? '',
         tanggal_pembayaran: resi.cod?.tanggalPembayaran ?? '',
         created_at: resi.createdAt,
@@ -271,8 +279,10 @@ class ResiServices {
       posisi_paket: resi.posisiPaket,
       estimasi_tiba: resi.estimasiTiba,
       status_paket: resi.statusPaket,
+      fee_jastip: resi.feeJastip,
       status_cod: resi.statusCod,
       jumlah_cod: resi.cod?.jumlahCod ?? 0,
+      fee_cod: resi.cod?.feeCod ?? 0,
       status_pembayaran_cod: resi.cod?.statusPembayaran ?? '',
       tanggal_pembayaran: resi.cod?.tanggalPembayaran ?? '',
       created_at: resi.createdAt,

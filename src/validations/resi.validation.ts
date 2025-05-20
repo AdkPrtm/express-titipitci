@@ -46,6 +46,19 @@ export const createResiSchema = z.object({
       invalid_type_error: 'Status COD harus berupa boolean (true/false)',
     }),
 
+    fee_cod: z
+      .number({
+        invalid_type_error: 'Fee COD harus berupa angka',
+      })
+      .nonnegative('Fee COD tidak boleh negatif')
+      .optional(),
+
+    fee_jastip: z
+      .number({
+        invalid_type_error: 'Fee Jastip harus berupa angka',
+      })
+      .nonnegative('Fee Jastip tidak boleh negatif'),
+
     jumlah_cod: z
       .number({
         invalid_type_error: 'Jumlah COD harus berupa angka',
@@ -168,13 +181,13 @@ export const updatePosisiSchema = z.object({
         invalid_type_error: 'Nomor resi harus berupa teks',
       })
       .min(1, 'Nomor resi tidak boleh kosong'),
-      
-      posisi_paket: z
+
+    posisi_paket: z
       .string({
         required_error: 'Posisi paket wajib diisi',
         invalid_type_error: 'Posisi paket harus berupa teks',
       })
       .trim()
       .min(1, 'Posisi paket tidak boleh kosong'),
-  })
-})
+  }),
+});

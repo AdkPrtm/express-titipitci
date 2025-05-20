@@ -6,8 +6,10 @@ export interface ResiResponse {
   posisi_paket: string;
   estimasi_tiba: Date;
   status_paket: string;
+  fee_jastip: number;
   status_cod: boolean;
   jumlah_cod: number;
+  fee_cod: number;
   status_pembayaran_cod: string;
   tanggal_pembayaran: string | Date;
   created_at: Date;

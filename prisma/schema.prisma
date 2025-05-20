@@ -64,8 +64,6 @@ model User {
 model Transaksi {
   id                Int                   @id @default(autoincrement())
   tanggalDiambil    DateTime              @map("tanggal_diambil")
-  feeCod            Float                 @map("fee_cod")
-  feeJastip         Float                 @map("fee_jastip")
   statusTransaksi   EnumStatusTransaksi   @map("status_transaksi")
   metodePembayaran  EnumMethodPembayaran  @map("metode_pembayaran")
   alamatPengambilan EnumAlamatPengambilan @map("alamat_pengambilan")
@@ -78,8 +76,8 @@ model Transaksi {
 
   transaksiItems TransaksiItem[]
 
-  @@map("transactions")
   @@index([userId])
+  @@map("transactions")
 }
 
 model Resi {
@@ -92,15 +90,16 @@ model Resi {
   estimasiTiba    DateTime    @map("estimasi_tiba")
   statusPaket     EnumProcces @map("status_paket")
   statusCod       Boolean     @map("status_cod")
+  feeJastip       Float       @default(0) @map("fee_jastip")
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt() @map("updated_at")
 
   transaksiItems TransaksiItem[]
   cod            COD?
 
-  @@map("resi")
   @@index([userId])
   @@index([noResi])
+  @@map("resi")
 }
 
 model TransaksiItem {
@@ -120,6 +119,7 @@ model TransaksiItem {
 model COD {
   id                Int                     @id @default(autoincrement())
   jumlahCod         Int
+  feeCod            Float                   @default(0) @map("fee_cod")
   statusPembayaran  EnumStatusPembayaranCOD
   methodPembayaran  EnumMethodPembayaran
   tanggalPembayaran DateTime?
