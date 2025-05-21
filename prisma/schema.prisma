@@ -67,6 +67,9 @@ model Transaksi {
   statusTransaksi   EnumStatusTransaksi   @map("status_transaksi")
   metodePembayaran  EnumMethodPembayaran  @map("metode_pembayaran")
   alamatPengambilan EnumAlamatPengambilan @map("alamat_pengambilan")
+  totalFeeJastip    Float                 @map("total_fee")
+  totalJumlahCod    Float                 @map("total_jumlah_cod")
+  totalFeeCod       Float                 @map("total_fee_cod")
   catatan           String?
   createdAt         DateTime              @default(now()) @map("created_at")
   updatedAt         DateTime              @updatedAt() @map("updated_at")

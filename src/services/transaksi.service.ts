@@ -15,9 +15,39 @@ import {
   EnumMethodPembayaran,
   EnumAlamatPengambilan,
 } from '@prisma/client';
-import { filter } from 'compression';
+import { TransaksiWithRelations } from '../utils/transaksi-formatter.utils';
 
 class TransaksiService {
+  private formatTransaksiToResponse(transaksi: TransaksiWithRelations[]): TransaksiResponseModel[] {
+    return transaksi.map((transaction) => ({
+      nama_penerima: {
+        name: transaction.user.name,
+        whatsapp_number: transaction.user.whatsappNumber,
+        address: transaction.user.address,
+        
+      },
+      nomor_resi: transaction.transaksiItems.map((item) => ({
+        nomor_resi: item.resi.noResi,
+        tanggal_diterima: item.resi.tanggalDiterima,
+        posisi_paket: item.resi.posisiPaket,
+        estimasi_tiba: item.resi.estimasiTiba,
+        status_paket: item.resi.statusPaket,
+        status_cod: item.resi.statusCod,
+        update_at: item.resi.updatedAt,
+      })),
+      tanggal_diambil: transaction.tanggalDiambil,
+      status_transaksi: transaction.statusTransaksi,
+      metode_pembayaran: transaction.metodePembayaran,
+      alamat_pengambilan: transaction.alamatPengambilan,
+      fee_jastip: transaction.totalFeeJastip,
+      jumlah_cod: transaction.totalJumlahCod,
+      fee_cod: transaction.totalFeeCod,
+      catatan: transaction.catatan ?? '',
+      status: transaction.statusTransaksi,
+      created_at: transaction.createdAt,
+    }));
+  }
+
   /**
    * Create a new transaksi.
    *
@@ -63,14 +93,10 @@ class TransaksiService {
       throw new AppError('User not found', 404);
     }
 
-    const totalResi: number = isResiExists ? isResiExists.length : 0;
-    const basePrice: number = totalResi > 1 ? 8000 : 10000;
-
-    const feeJastip: number = basePrice * totalResi;
-    const statusCod: boolean[] = isResiExists
-      ? isResiExists.map((resi) => resi.statusCod === true)
-      : [];
-    const feeCod: number = statusCod.filter((status) => status).length * 5000;
+    const totalAllFee: number = isResiExists.map((resi) => resi.feeJastip).reduce((a, b) => a + b, 0);
+    const finalFee: number = isResiExists.length > 1 ? totalAllFee * 0.8 : totalAllFee;
+    const totalCod: number = isResiExists.map((resi) => resi.cod?.jumlahCod ?? 0).reduce((a, b) => a + b, 0);
+    const totalFeeCod: number = isResiExists.map((resi) => resi.cod?.feeCod ?? 0).reduce((a, b) => a + b, 0);
 
     const { transaksi, updatedResults } = await prisma.$transaction(
       async (tx) => {
@@ -78,10 +104,11 @@ class TransaksiService {
           data: {
             userId: user_id,
             tanggalDiambil: tanggal_diambil,
-            feeCod: feeCod,
-            feeJastip: feeJastip,
             metodePembayaran: metode_pembayaran,
             alamatPengambilan: alamat_pengambilan,
+            totalFeeJastip: finalFee,
+            totalJumlahCod: totalCod,
+            totalFeeCod: totalFeeCod,
             catatan: catatan,
             statusTransaksi: 'BERHASIL',
           },
@@ -136,12 +163,13 @@ class TransaksiService {
         update_at: dataResi.updatedAt,
       })),
       tanggal_diambil: transaksi.tanggalDiambil,
-      fee_cod: transaksi.feeCod,
-      fee_jastip: transaksi.feeJastip,
       status: '',
       status_transaksi: transaksi.statusTransaksi,
       metode_pembayaran: transaksi.metodePembayaran,
       alamat_pengambilan: transaksi.alamatPengambilan,
+      fee_jastip: transaksi.totalFeeJastip,
+      jumlah_cod: transaksi.totalJumlahCod,
+      fee_cod: transaksi.totalFeeCod,
       catatan: transaksi.catatan ?? '',
       created_at: transaksi.createdAt,
     };
@@ -192,35 +220,7 @@ class TransaksiService {
       throw new AppError('Failed to get transaksi data', 500);
     }
 
-    const formattedTransactions: TransaksiResponseModel[] = transaksi.map(
-      (transaction) => {
-        return {
-          nama_penerima: {
-            name: transaction.user.name,
-            whatsapp_number: transaction.user.whatsappNumber,
-            address: transaction.user.address,
-          },
-          nomor_resi: transaction.transaksiItems.map((item) => ({
-            nomor_resi: item.resi.noResi,
-            tanggal_diterima: item.resi.tanggalDiterima,
-            posisi_paket: item.resi.posisiPaket,
-            estimasi_tiba: item.resi.estimasiTiba,
-            status_paket: item.resi.statusPaket,
-            status_cod: item.resi.statusCod,
-            update_at: item.resi.updatedAt,
-          })),
-          tanggal_diambil: transaction.tanggalDiambil,
-          fee_cod: transaction.feeCod,
-          fee_jastip: transaction.feeJastip,
-          status_transaksi: transaction.statusTransaksi,
-          metode_pembayaran: transaction.metodePembayaran,
-          alamat_pengambilan: transaction.alamatPengambilan,
-          catatan: transaction.catatan ?? '',
-          status: transaction.statusTransaksi,
-          created_at: transaction.createdAt,
-        };
-      },
-    );
+    const formattedTransactions = this.formatTransaksiToResponse(transaksi);
 
     logger.debug(`Resi data retrieved successfully`);
     const hasNextPage = transaksi.length > limit;
@@ -328,35 +328,7 @@ class TransaksiService {
       `Filtered resi data retrieved successfully with filter: ${keywordSearch} `,
     );
 
-    const formattedTransactions: TransaksiResponseModel[] = transaksi.map(
-      (transaction) => {
-        return {
-          nama_penerima: {
-            name: transaction.user.name,
-            whatsapp_number: transaction.user.whatsappNumber,
-            address: transaction.user.address,
-          },
-          nomor_resi: transaction.transaksiItems.map((item) => ({
-            nomor_resi: item.resi.noResi,
-            tanggal_diterima: item.resi.tanggalDiterima,
-            posisi_paket: item.resi.posisiPaket,
-            estimasi_tiba: item.resi.estimasiTiba,
-            status_paket: item.resi.statusPaket,
-            status_cod: item.resi.statusCod,
-            update_at: item.resi.updatedAt,
-          })),
-          tanggal_diambil: transaction.tanggalDiambil,
-          fee_cod: transaction.feeCod,
-          fee_jastip: transaction.feeJastip,
-          status_transaksi: transaction.statusTransaksi,
-          metode_pembayaran: transaction.metodePembayaran,
-          alamat_pengambilan: transaction.alamatPengambilan,
-          catatan: transaction.catatan ?? '',
-          status: transaction.statusTransaksi,
-          created_at: transaction.createdAt,
-        };
-      },
-    );
+    const formattedTransactions = this.formatTransaksiToResponse(transaksi);
 
     const hasNextPage = transaksi.length > limit;
     const data = hasNextPage

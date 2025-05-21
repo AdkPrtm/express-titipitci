@@ -18,11 +18,12 @@ export interface TransaksiResponseModel {
   nama_penerima: DataUser;
   nomor_resi: DataResi[];
   tanggal_diambil: Date;
-  fee_cod: number;
-  fee_jastip: number;
   status_transaksi: string;
   metode_pembayaran: string;
   alamat_pengambilan: string;
+  fee_jastip: number;
+  jumlah_cod: number;
+  fee_cod: number;
   catatan: string;
   status: string;
   created_at: Date;
